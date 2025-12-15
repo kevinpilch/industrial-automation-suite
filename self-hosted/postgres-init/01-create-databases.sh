@@ -1,29 +1,29 @@
 #!/bin/bash
 # =============================================================================
-# Erstellt die Service-Datenbanken beim ersten Start von PostgreSQL
+# Creates service databases on first PostgreSQL startup
 # =============================================================================
 
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    -- Datenbank für NocoDB
+    -- Database for NocoDB
     CREATE DATABASE nocodb;
     GRANT ALL PRIVILEGES ON DATABASE nocodb TO $POSTGRES_USER;
 
-    -- Datenbank für n8n
+    -- Database for n8n
     CREATE DATABASE n8n;
     GRANT ALL PRIVILEGES ON DATABASE n8n TO $POSTGRES_USER;
 
-    -- Datenbank für Metabase
+    -- Database for Metabase
     CREATE DATABASE metabase;
     GRANT ALL PRIVILEGES ON DATABASE metabase TO $POSTGRES_USER;
 EOSQL
 
-# Berechtigungen für public schema in jeder Datenbank
+# Grant permissions for public schema in each database
 for db in nocodb n8n metabase; do
     psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$db" <<-EOSQL
         GRANT ALL ON SCHEMA public TO $POSTGRES_USER;
 EOSQL
 done
 
-echo "Service-Datenbanken erfolgreich erstellt."
+echo "Service databases created successfully."

@@ -1,0 +1,7 @@
+---
+- name: Configure Raspberry Pi for Industrial Automation Suite
+  hosts: all
+  roles:
+    - base
+    - docker
+    - automation-stack

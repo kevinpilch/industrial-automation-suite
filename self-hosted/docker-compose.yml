@@ -1,5 +1,5 @@
 services:
-  # PostgreSQL - Zentrale Datenbank
+  # PostgreSQL - Central database
   postgres:
     image: postgres:16-alpine
     container_name: automation-postgres
@@ -11,8 +11,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-init:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-automation} -d ${POSTGRES_DB:-automation}"]
       interval: 10s
@@ -21,7 +19,7 @@ services:
     networks:
       - automation-network
 
-  # Flyway - Datenbank-Migrationen
+  # Flyway - Database migrations
   flyway:
     image: flyway/flyway:latest
     container_name: automation-flyway
@@ -41,7 +39,7 @@ services:
     networks:
       - automation-network
 
-  # NocoDB - Datenbank-Frontend (Airtable-Alternative)
+  # NocoDB - Database frontend (Airtable alternative)
   nocodb:
     image: nocodb/nocodb:latest
     container_name: automation-nocodb
@@ -60,7 +58,7 @@ services:
     networks:
       - automation-network
 
-  # n8n - Workflow Automation
+  # n8n - Workflow automation
   n8n:
     image: n8nio/n8n:latest
     container_name: automation-n8n
@@ -76,6 +74,7 @@ services:
       N8N_HOST: ${N8N_HOST:-localhost}
       N8N_PORT: 5678
       N8N_PROTOCOL: ${N8N_PROTOCOL:-http}
+      N8N_SECURE_COOKIE: "false"
       WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://localhost:5678}
       GENERIC_TIMEZONE: ${TIMEZONE:-Europe/Berlin}
     volumes:
@@ -88,7 +87,7 @@ services:
     networks:
       - automation-network
 
-  # Metabase - Analytics und Reporting
+  # Metabase - Analytics and reporting
   metabase:
     image: metabase/metabase:latest
     container_name: automation-metabase
@@ -112,7 +111,7 @@ services:
     networks:
       - automation-network
 
-  # Uptime Kuma - Monitoring und Alerting
+  # Uptime Kuma - Monitoring and alerting
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: automation-uptime-kuma

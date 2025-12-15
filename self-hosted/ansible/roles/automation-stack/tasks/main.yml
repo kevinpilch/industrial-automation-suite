@@ -1,0 +1,61 @@
+---
+- name: Create automation stack directory
+  file:
+    path: "{{ stack_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+
+- name: Create subdirectories
+  file:
+    path: "{{ stack_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  loop:
+    - migrations
+    - postgres-init
+
+- name: Copy docker-compose.yml
+  copy:
+    src: "{{ playbook_dir }}/../../docker-compose.yml"
+    dest: "{{ stack_dir }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Copy migration files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ stack_dir }}/migrations/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  with_fileglob:
+    - "{{ playbook_dir }}/../../migrations/*.sql"
+
+- name: Copy postgres-init scripts
+  copy:
+    src: "{{ item }}"
+    dest: "{{ stack_dir }}/postgres-init/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  with_fileglob:
+    - "{{ playbook_dir }}/../../postgres-init/*.sh"
+
+- name: Template environment file
+  template:
+    src: .env.j2
+    dest: "{{ stack_dir }}/.env"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Start automation stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ stack_dir }}"
+    state: present
+  become: false

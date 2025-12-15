@@ -1,0 +1,12 @@
+# Ansible Vault Secrets
+# =====================
+# Copy this file and encrypt it:
+#   cp vault.yml.example vault.yml
+#   ansible-vault encrypt vault.yml
+#
+# Generate secrets with: openssl rand -hex 32
+
+vault_postgres_password: "REPLACE_ME"
+vault_nocodb_jwt_secret: "REPLACE_ME"
+vault_n8n_encryption_key: "REPLACE_ME"
+vault_metabase_secret_key: "REPLACE_ME"

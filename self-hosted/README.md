@@ -1,117 +1,65 @@
 # Industrial Automation Suite - Self-Hosted
 
-Self-Hosted Variante der Industrial Automation Suite für R&D-Umgebungen.
+Self-Hosted Deployment der Industrial Automation Suite.
 
-## Komponenten
-
-| Service | Port | Beschreibung |
-|---------|------|--------------|
-| PostgreSQL 16 | 5432 | Zentrale Datenbank |
-| NocoDB | 8080 | Datenbank-Frontend (Airtable-Alternative) |
-| n8n | 5678 | Workflow Automation |
-| Metabase | 3000 | Analytics und Reporting |
-| Uptime Kuma | 3001 | Monitoring und Alerting |
-| Flyway | - | Datenbank-Migrationen |
-
-## Voraussetzungen
-
-- Docker >= 20.10
-- Docker Compose >= 2.0
-
-## Installation
+## Schnellstart (Lokal)
 
 ```bash
-# 1. Konfiguration erstellen
-cp .env.example .env
-
-# 2. Sichere Secrets generieren
-openssl rand -hex 32  # Für NOCODB_JWT_SECRET
-openssl rand -hex 32  # Für N8N_ENCRYPTION_KEY
-openssl rand -hex 32  # Für METABASE_SECRET_KEY
-
-# 3. .env Datei anpassen (Passwörter und Secrets eintragen)
-nano .env
-
-# 4. Services starten
-docker compose up -d
+./setup.sh
 ```
 
-## Zugriff
+## Service-Zugriff
 
 Nach dem Start sind die Services unter folgenden URLs erreichbar:
 
-- **NocoDB**: http://localhost:8080
-- **n8n**: http://localhost:5678
-- **Metabase**: http://localhost:3000
-- **Uptime Kuma**: http://localhost:3001
+| Service | URL | Beschreibung |
+|---------|-----|--------------|
+| **NocoDB** | http://localhost:8080 | Datenbank-Frontend (Airtable-Alternative) |
+| **n8n** | http://localhost:5678 | Workflow-Automatisierung |
+| **Metabase** | http://localhost:3000 | Analytics und Reporting |
+| **Uptime Kuma** | http://localhost:3001 | Monitoring und Alerting |
 
-## Datenbank-Struktur
-
-PostgreSQL enthält separate Datenbanken für jeden Service:
-
-| Datenbank | Verwendung |
-|-----------|------------|
-| `automation` | Hauptdatenbank, Flyway-Migrationen |
-| `nocodb` | NocoDB Metadaten und Benutzerdaten |
-| `n8n` | n8n Workflows und Credentials |
-| `metabase` | Metabase Konfiguration |
-
-## Migrationen
-
-Datenbank-Migrationen werden mit Flyway verwaltet. Neue Migrationen im `migrations/` Ordner ablegen:
-
-```
-migrations/
-├── V1__create_service_databases.sql
-├── V2__your_migration.sql
-└── V3__another_migration.sql
-```
-
-Namenskonvention: `V{version}__{beschreibung}.sql`
-
-Migrationen manuell ausführen:
-
-```bash
-docker compose run --rm flyway migrate
-```
+> **Hinweis:** Metabase benötigt ca. 1-2 Minuten zum Starten (Java-basiert).
 
 ## Verwaltung
 
 ```bash
-# Status aller Services
+# Status anzeigen
 docker compose ps
 
-# Logs anzeigen
-docker compose logs -f [service]
+# Logs verfolgen
+docker compose logs -f
 
-# Service neustarten
+# Einzelnen Service neustarten
 docker compose restart [service]
 
-# Alle Services stoppen
+# Services stoppen
 docker compose down
 
-# Alle Services inkl. Volumes löschen (DATENVERLUST!)
+# Alles löschen (inkl. Daten!)
 docker compose down -v
 ```
 
-## Backup
+## Server-Deployment mit Ansible
+
+Für Deployment auf einem dedizierten Server (z.B. Raspberry Pi) siehe `ansible/` Verzeichnis.
 
 ```bash
-# PostgreSQL Backup erstellen
-docker compose exec postgres pg_dumpall -U automation > backup.sql
-
-# Backup wiederherstellen
-cat backup.sql | docker compose exec -T postgres psql -U automation
+cd ansible
+ansible-playbook playbooks/site.yml
 ```
 
-## Volumes
+### Service-Zugriff (Server)
 
-Persistente Daten werden in Docker Volumes gespeichert:
+Ersetze `<server>` mit dem Hostnamen oder der IP-Adresse deines Servers:
 
-| Volume | Inhalt |
-|--------|--------|
-| `automation-postgres-data` | PostgreSQL Daten |
-| `automation-nocodb-data` | NocoDB Dateien |
-| `automation-n8n-data` | n8n Workflows |
-| `automation-metabase-data` | Metabase Konfiguration |
-| `automation-uptime-kuma-data` | Uptime Kuma Daten |
+| Service | URL |
+|---------|-----|
+| **NocoDB** | http://\<server\>:8080 |
+| **n8n** | http://\<server\>:5678 |
+| **Metabase** | http://\<server\>:3000 |
+| **Uptime Kuma** | http://\<server\>:3001 |
+
+## Weitere Dokumentation
+
+Siehe [Haupt-README](../README.md) für vollständige Dokumentation.

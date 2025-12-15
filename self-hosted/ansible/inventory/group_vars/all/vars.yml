@@ -1,0 +1,29 @@
+# Stack deployment directory on target host
+stack_dir: /opt/automation-stack
+
+# PostgreSQL (internal only, not exposed to host)
+postgres_user: automation
+postgres_password: "{{ vault_postgres_password }}"
+postgres_db: automation
+
+# NocoDB
+nocodb_jwt_secret: "{{ vault_nocodb_jwt_secret }}"
+nocodb_port: 8080
+nocodb_public_url: "http://{{ ansible_host }}:{{ nocodb_port }}"
+
+# n8n
+n8n_encryption_key: "{{ vault_n8n_encryption_key }}"
+n8n_port: 5678
+n8n_host: "{{ ansible_host }}"
+n8n_protocol: http
+n8n_webhook_url: "http://{{ ansible_host }}:{{ n8n_port }}"
+
+# Metabase
+metabase_secret_key: "{{ vault_metabase_secret_key }}"
+metabase_port: 3000
+
+# Uptime Kuma
+uptime_kuma_port: 3001
+
+# General
+timezone: Europe/Berlin
