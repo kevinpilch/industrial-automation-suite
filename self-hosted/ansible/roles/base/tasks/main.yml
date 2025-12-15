@@ -1,0 +1,41 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+
+- name: Install essential packages
+  apt:
+    name:
+      - vim
+      - git
+      - curl
+      - htop
+      - ufw
+    state: present
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone | default('Europe/Berlin') }}"
+
+- name: Enable UFW with SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    state: enabled
+
+- name: Allow automation stack ports through firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - "{{ nocodb_port | default('8080') }}"
+    - "{{ n8n_port | default('5678') }}"
+    - "{{ metabase_port | default('3000') }}"
+    - "{{ uptime_kuma_port | default('3001') }}"

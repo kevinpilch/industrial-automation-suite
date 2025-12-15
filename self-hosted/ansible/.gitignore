@@ -1,0 +1,6 @@
+# Never commit unencrypted vault files
+# vault.yml should be encrypted with ansible-vault before committing
+# If in doubt, keep vault.yml out of git entirely
+
+# Retry files
+*.retry
